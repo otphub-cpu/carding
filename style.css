@@ -180,7 +180,7 @@ body[data-planet="dollar"] {
 }
 
 /* EURO / SERVER 06: QUANTUM COBALT & CYBER INDIGO */
-body[data-planet="euro"] {
+body[data-planet="euro"], body[data-planet="hulaman"] {
     --hacker-bg: #02050e;
     --hacker-bg2: #050d1f;
     --hacker-bg3: #0a1733;
@@ -198,6 +198,26 @@ body[data-planet="euro"] {
     --text-3: #38759c;
     --text-mono: #38bdf8;
     --cyber-shadow: 0 0 22px rgba(56, 189, 248, 0.25);
+}
+/* BETA / SERVER 07: ELECTRIC CYAN & QUANTUM EMERALD */
+body[data-planet="beta"] {
+    --hacker-bg: #030d12;
+    --hacker-bg2: #061821;
+    --hacker-bg3: #0b2533;
+    --hacker-card: rgba(6, 24, 33, 0.94);
+    --hacker-card-hover: rgba(11, 37, 51, 0.98);
+    --orbit-accent: #00f0ff;
+    --orbit-secondary: #00e676;
+    --orbit-glow: rgba(0, 240, 255, 0.5);
+    --orbit-border: rgba(0, 240, 255, 0.32);
+    --orbit-border-bright: rgba(0, 240, 255, 0.9);
+    --orbit-badge-bg: rgba(0, 240, 255, 0.16);
+    --orbit-badge-text: #00f0ff;
+    --text: #f0fdff;
+    --text-2: #cffafe;
+    --text-3: #0891b2;
+    --text-mono: #00f0ff;
+    --cyber-shadow: 0 0 22px rgba(0, 240, 255, 0.25);
 }
 
 /* ==========================================================================
@@ -1876,8 +1896,8 @@ body::before {
 .icon-blue { background: rgba(0, 255, 102, 0.15); border: 1px solid #00ff66; }
 .icon-red { background: rgba(255, 0, 60, 0.15); border: 1px solid #ff003c; }
 .icon-emerald { background: rgba(0, 255, 136, 0.15); border: 1px solid #00ff88; }
-.icon-indigo { background: rgba(56, 189, 248, 0.15); border: 1px solid #38bdf8; }
-
+.icon-indigo, .icon-hulaman { background: rgba(56, 189, 248, 0.15); border: 1px solid #38bdf8; }
+.icon-beta { background: rgba(0, 240, 255, 0.15); border: 1px solid #00f0ff; }
 .server-info {
     flex: 1;
     min-width: 0;
